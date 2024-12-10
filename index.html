@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', sans-serif;
+            margin: 20px;
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #90caf9;
+            font-size: 30px;
+            direction: rtl;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.4);
+        }
+        .question-container {
+            margin-bottom: 25px;
+            padding: 25px;
+            border-radius: 15px;
+            background-color: #1e1e1e;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+			direction: rtl;
+        }
+        .question {
+            color: #64b5f6;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            line-height: 1.5;
+			direction: rtl;
+        }
+.option {
+    cursor: pointer;
+    padding: 12px 18px;
+    border: 2px solid #37474f;
+    border-radius: 10px;
+    margin: 10px 0;
+    background-color: #263238;
+    color: #e0e0e0;
+    font-size: 18px;
+    text-align: right; /* تعديل المحاذاة */
+    display: block;
+    transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
+    direction: rtl; /* اتجاه النص */
+}
+        .option:hover {
+            background-color: #546e7a;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+        }
+        .option.correct {
+            background-color: #388e3c;
+            color: white;
+        }
+        .option.wrong {
+            background-color: #d32f2f;
+            color: white;
+        }
+        .option.selected {
+            transform: scale(1.05);
+        }
+        .result {
+            font-size: 28px;
+            margin-top: 30px;
+            font-weight: bold;
+            color: gold;
+            text-align: center;
+            text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.5);
+            display: none;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            font-size: 18px;
+            color: #ccc;
+        }
+        .hint {
+            color: yellow;
+            font-size: 16px;
+            margin-top: 10px;
+            display: none;
+            text-align: right;
+            direction: rtl;
+        }
+    </style>
+</head>
+<body>
+    <h1>اختبار اجتماعيات</h1>
+    <div id="quiz-container">
+        <div class="quiz">
+            <div class="question-container">
+                <p class="question">1. تتركز صناعة الزجاج في محافظة .......</p>
+                <div class="option" data-correct="false">ديالى</div>
+                <div class="option" data-correct="false">بابل</div>
+                <div class="option" data-correct="true">الأنبار</div>
+            </div>
+            <div class="question-container">
+                <p class="question">2. التبغ والتنباك من المحاصيل ........</p>
+                <div class="option" data-correct="false">الشتوية</div>
+				<div class="option" data-correct="false">الربيعية</div>
+                <div class="option" data-correct="true">الصيفية</div>
+            </div>
+            <div class="question-container">
+                <p class="question">3. دراسة توزيع السكان بين الحضر والريف يقصد به التركيب ....... للسكان</p>
+                <div class="option" data-correct="true">البيئي</div>
+				<div class="option" data-correct="false">النوعي</div>
+                <div class="option" data-correct="false">العمري</div>
+            </div>
+			<div class="question-container">
+                <p class="question">4. من الحقول النفطية في محافظة ميسان حقل ....... </p>
+                <div class="option" data-correct="false">الأحدب</div>
+				<div class="option" data-correct="true">بزرگان</div>
+                <div class="option" data-correct="false">مجنون</div>
+            </div>
+			<div class="question-container">
+                <p class="question">5. الخباز والحلبة والبابونك من النباتات .......</p>
+                <div class="option" data-correct="false">المعمرة</div>
+                <div class="option" data-correct="false">النفضية</div>
+				<div class="option" data-correct="true">الحولية</div>
+            </div>
+			</div>
+
+        <div class="result">درجتك: <span id="score">0</span></div>
+    </div>
+
+    <div class="footer">إعداد الأستاذ: علي حسين</div>
+
+    <script>
+        const options = document.querySelectorAll('.option');
+        const resultSpan = document.getElementById('score');
+        const resultDiv = document.querySelector('.result');
+        let score = 0;
+        let answeredQuestions = 0;
+
+        const correctSound = new Audio('Sounds/Correct.wav');
+        const wrongSound = new Audio('Sounds/Wrong.wav');
+
+        options.forEach(option => {
+            option.addEventListener('click', () => {
+                const question = option.parentElement;
+                const alreadyAnswered = question.querySelector('.option.correct') || question.querySelector('.option.wrong');
+                const hint = question.querySelector('.hint');
+
+                if (alreadyAnswered) {
+                    return;
+                }
+
+                const isCorrect = option.getAttribute('data-correct') === "true";
+                if (isCorrect) {
+                    option.classList.add('correct');
+                    score += 2;
+                    correctSound.play();
+                } else {
+                    option.classList.add('wrong');
+                    wrongSound.play();
+                    if (hint) hint.style.display = 'block';
+                    if (navigator.vibrate) {
+                        navigator.vibrate(80);
+                    }
+                }
+
+                const siblings = question.querySelectorAll('.option');
+                siblings.forEach(sibling => {
+                    if (sibling.getAttribute('data-correct') === "true") {
+                        sibling.classList.add('correct');
+                    }
+                });
+
+                option.classList.add('selected');
+                answeredQuestions++;
+
+                if (answeredQuestions === document.querySelectorAll('.question-container').length) {
+                    resultDiv.style.display = 'block';
+                }
+
+                resultSpan.textContent = score;
+            });
+        });
+    </script>
+</body>
+</html>
